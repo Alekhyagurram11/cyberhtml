@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuromorphic Swarm Intelligence - Complete Solution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .solution-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(255,193,7,0.3);
+        }
+
+        .header h1 {
+            font-size: 3.2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffc107, #ff9800, #ff5722);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,193,7,0.5);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .mode-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border: none;
+            color: white;
+            padding: 18px 35px;
+            border-radius: 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            min-width: 250px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(76,175,80,0.5);
+        }
+
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .mode-btn:hover::before {
+            left: 100%;
+        }
+
+        .demo-stage {
+            flex: 1;
+            position: relative;
+            padding: 40px;
+            min-height: 700px;
+        }
+
+        .demo-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .demo-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demo-title {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: slideDown 1s ease 0.2s forwards;
+        }
+
+        .demo-subtitle {
+            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: slideDown 1s ease 0.4s forwards;
+            color: #bdc3c7;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Swarm Architecture Styles */
+        .swarm-layers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .swarm-layer {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255,193,7,0.3);
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: all 0.7s ease;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swarm-layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffc107, #ff9800, #ff5722);
+            transform: scaleX(0);
+            transition: transform 0.8s ease;
+        }
+
+        .swarm-layer.animate-in {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .swarm-layer.animate-in::before {
+            transform: scaleX(1);
+        }
+
+        .swarm-layer.highlight {
+            border-color: #4caf50;
+            box-shadow: 0 0 40px rgba(76,175,80,0.4);
+            transform: translateY(-10px) scale(1.03);
+        }
+
+        .layer-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #ffc107;
+            text-shadow: 0 0 10px rgba(255,193,7,0.5);
+        }
+
+        .swarm-component {
+            background: rgba(255,255,255,0.12);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #ffc107;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .swarm-component.animate-in {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .swarm-component.highlight {
+            background: rgba(76,175,80,0.25);
+            border-left-color: #4caf50;
+            transform: translateX(15px);
+            box-shadow: 0 5px 20px rgba(76,175,80,0.3);
+        }
+
+        .component-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .component-icon {
+            font-size: 2em;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 10px rgba(255,193,7,0.5));
+        }
+
+        .component-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #ecf0f1;
+        }
+
+        .component-desc {
+            font-size: 0.95em;
+            color: #bdc3c7;
+            line-height: 1.5;
+            margin-left: 60px;
+        }
+
+        .component-metrics {
+            margin-top: 10px;
+            margin-left: 60px;
+            font-size: 0.85em;
+            color: #ff9800;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .swarm-component.highlight .component-metrics {
+            opacity: 1;
+        }
+
+        /* Swarm Visualization */
+        .swarm-flow-section {
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .flow-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #ffc107;
+        }
+
+        .swarm-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .swarm-step {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+            position: relative;
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+            transition: all 0.6s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .swarm-step.animate-in {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .swarm-step.highlight {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            transform: scale(1.15) rotate(0deg);
+            box-shadow: 0 0 30px rgba(76,175,80,0.6);
+        }
+
+        .swarm-step-label {
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.4em;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #bdc3c7;
+        }
+
+        .swarm-arrow {
+            font-size: 2.5em;
+            color: #ff9800;
+            opacity: 0;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 10px rgba(255,152,0,0.5));
+        }
+
+        .swarm-arrow.animate-in {
+            opacity: 1;
+            animation: swarmPulse 2s infinite;
+        }
+
+        .swarm-arrow.highlight {
+            color: #4caf50;
+            animation: swarmBounce 0.8s infinite;
+        }
+
+        @keyframes swarmPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @keyframes swarmBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Example Timeline Styles */
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-track {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff9800, #4caf50);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 60px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 45%;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,193,7,0.3);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .timeline-content.highlight {
+            border-color: #4caf50;
+            box-shadow: 0 0 30px rgba(76,175,80,0.4);
+            transform: scale(1.05);
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: #ff9800;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 20px rgba(255,152,0,0.5);
+            z-index: 10;
+        }
+
+        .timeline-marker.highlight {
+            background: #4caf50;
+            box-shadow: 0 0 30px rgba(76,175,80,0.8);
+            animation: swarmPing 1s infinite;
+        }
+
+        @keyframes swarmPing {
+            0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+            70% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 10px rgba(76,175,80,0); }
+            100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+        }
+
+        .timeline-time {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .timeline-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #ecf0f1;
+            margin-bottom: 15px;
+        }
+
+        .swarm-analysis {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #ffc107;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swarm-analysis::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,193,7,0.1), transparent);
+            animation: swarmScan 2s infinite;
+        }
+
+        @keyframes swarmScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .analysis-line {
+            margin: 8px 0;
+            color: #ffc107;
+            opacity: 0;
+            animation: typeIn 0.5s forwards;
+        }
+
+        .analysis-line:nth-child(1) { animation-delay: 0.3s; }
+        .analysis-line:nth-child(2) { animation-delay: 0.6s; }
+        .analysis-line:nth-child(3) { animation-delay: 0.9s; }
+        .analysis-line:nth-child(4) { animation-delay: 1.2s; }
+
+        @keyframes typeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .swarm-status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 5px;
+            animation: swarmStatusPulse 2s infinite;
+        }
+
+        .status-warning { background: #ff9800; color: #1a1a1a; }
+        .status-danger { background: #f44336; color: white; }
+        .status-success { background: #4caf50; color: white; }
+
+        @keyframes swarmStatusPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Bee Animation Effects */
+        .bee-swarm {
+            position: absolute;
+            font-size: 1.5em;
+            color: #ffc107;
+            animation: beeFloat 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes beeFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(90deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+            75% { transform: translateY(-20px) rotate(270deg); }
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,193,7,0.3);
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        .control-btn.success {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        }
+
+        /* Progress and Narration */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9800 0%, #4caf50 100%);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .narration {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,193,7,0.3);
+        }
+
+        .narration h4 {
+            color: #ffc107;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .narration p {
+            line-height: 1.7;
+            color: #ecf0f1;
+            font-size: 1.05em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .narration {
+                position: static;
+                margin: 20px;
+                max-width: none;
+                transform: none;
+            }
+            
+            .timeline-item {
+                flex-direction: column !important;
+                align-items: center;
+            }
+            
+            .timeline-content {
+                width: 90%;
+            }
+            
+            .timeline-track {
+                left: 20px;
+                transform: none;
+            }
+            
+            .timeline-marker {
+                left: 20px;
+                transform: translateX(-50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                position: static;
+                margin: 20px auto;
+                transform: none;
+                flex-wrap: wrap;
+            }
+            
+            .swarm-layers {
+                grid-template-columns: 1fr;
+            }
+            
+            .swarm-flow {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .swarm-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="solution-container">
+        <div class="header">
+            <h1>🐝 Neuromorphic Swarm Intelligence Defense Network</h1>
+            <p>Brain-Inspired Collective Intelligence for Threat Detection & Neutralization</p>
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="workflow">🧠 Swarm Architecture Workflow</button>
+                <button class="mode-btn" data-mode="example">⚡ Coordinated Attack Response</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="demo-stage">
+            <!-- Workflow Architecture View -->
+            <div class="demo-view active" id="workflow-view">
+                <h2 class="demo-title">🧠 Complete Swarm Architecture</h2>
+                <p class="demo-subtitle">Distributed neuromorphic agents working like digital bees for collective intelligence</p>
+
+                <div class="swarm-layers">
+                    <div class="swarm-layer" data-step="1">
+                        <div class="layer-title">🚀 Swarm Deployment Layer</div>
+                        <div class="swarm-component" data-step="1">
+                            <div class="component-header">
+                                <div class="component-icon">🐝</div>
+                                <div class="component-name">Neuromorphic Bee Agents</div>
+                            </div>
+                            <div class="component-desc">Thousands of specialized AI agents with spiking neural networks</div>
+                            <div class="component-metrics">🧠 Type: Spiking neural networks | ⚡ Agents: 10,000+ per node</div>
+                        </div>
+                        <div class="swarm-component" data-step="2">
+                            <div class="component-header">
+                                <div class="component-icon">💻</div>
+                                <div class="component-name">Edge Device Integration</div>
+                            </div>
+                            <div class="component-desc">Intel Loihi neuromorphic chips in connected devices</div>
+                            <div class="component-metrics">⚡ Power: 0.1W per agent | 📱 Devices: 500K+ worldwide</div>
+                        </div>
+                        <div class="swarm-component" data-step="3">
+                            <div class="component-header">
+                                <div class="component-icon">🌐</div>
+                                <div class="component-name">Mesh Network Formation</div>
+                            </div>
+                            <div class="component-desc">Self-organizing decentralized communication network</div>
+                            <div class="component-metrics">🔗 Topology: Mesh | 🛡️ Redundancy: 99.99% uptime</div>
+                        </div>
+                    </div>
+
+                    <div class="swarm-layer" data-step="4">
+                        <div class="layer-title">👁️ Real-Time Monitoring Core</div>
+                        <div class="swarm-component" data-step="4">
+                            <div class="component-header">
+                                <div class="component-icon">🔍</div>
+                                <div class="component-name">Scout Agent Swarms</div>
+                            </div>
+                            <div class="component-desc">Continuous content monitoring across all platforms</div>
+                            <div class="component-metrics">⚡ Speed: 8-second convergence | 👁️ Coverage: Global</div>
+                        </div>
+                        <div class="swarm-component" data-step="5">
+                            <div class="component-header">
+                                <div class="component-icon">⚛️</div>
+                                <div class="component-name">Worker Agent Collectives</div>
+                            </div>
+                            <div class="component-desc">Collaborative analysis through emergent intelligence</div>
+                            <div class="component-metrics">🧠 Intelligence: Emergent | 🎯 Accuracy: 99.7%</div>
+                        </div>
+                        <div class="swarm-component" data-step="6">
+                            <div class="component-header">
+                                <div class="component-icon">🕵️</div>
+                                <div class="component-name">Multi-Modal Detection</div>
+                            </div>
+                            <div class="component-desc">Deepfake and AI malware detection through specialized swarms</div>
+                            <div class="component-metrics">🎭 Deepfakes: 94% detection | 🦠 Malware: Real-time tracking</div>
+                        </div>
+                    </div>
+
+                    <div class="swarm-layer" data-step="7">
+                        <div class="layer-title">🧠 Collective Intelligence Engine</div>
+                        <div class="swarm-component" data-step="7">
+                            <div class="component-header">
+                                <div class="component-icon">🎯</div>
+                                <div class="component-name">Hive Mind Processing</div>
+                            </div>
+                            <div class="component-desc">Super-intelligent collective from simple individual agents</div>
+                            <div class="component-metrics">🧠 Emergence: No central control | 🎯 Coordination: Self-organizing</div>
+                        </div>
+                        <div class="swarm-component" data-step="8">
+                            <div class="component-header">
+                                <div class="component-icon">⚔️</div>
+                                <div class="component-name">Attack Swarm Deployment</div>
+                            </div>
+                            <div class="component-desc">Coordinated threat neutralization forces</div>
+                            <div class="component-metrics">⚡ Response: 8 seconds | 🛡️ Success: 99.7% neutralization</div>
+                        </div>
+                        <div class="swarm-component" data-step="9">
+                            <div class="component-header">
+                                <div class="component-icon">🔄</div>
+                                <div class="component-name">Adaptive Learning System</div>
+                            </div>
+                            <div class="component-desc">Continuous evolution and improvement of swarm capabilities</div>
+                            <div class="component-metrics">📈 Learning: Continuous | 🧬 Evolution: Automatic adaptation</div>
+                        </div>
+                    </div>
+
+                    <div class="swarm-layer" data-step="10">
+                        <div class="layer-title">🌐 Ubiquitous Protection Network</div>
+                        <div class="swarm-component" data-step="10">
+                            <div class="component-header">
+                                <div class="component-icon">🛡️</div>
+                                <div class="component-name">Edge Swarm Computing</div>
+                            </div>
+                            <div class="component-desc">Device-level protection without central dependencies</div>
+                            <div class="component-metrics">📱 Devices: Every connected device | ⚡ Latency: <1ms</div>
+                        </div>
+                        <div class="swarm-component" data-step="11">
+                            <div class="component-header">
+                                <div class="component-icon">👁️</div>
+                                <div class="component-name">Transparent Operations</div>
+                            </div>
+                            <div class="component-desc">Visible swarm activity for democratic trust building</div>
+                            <div class="component-metrics">👥 Visibility: Real-time monitoring | 🗳️ Governance: Democratic</div>
+                        </div>
+                        <div class="swarm-component" data-step="12">
+                            <div class="component-header">
+                                <div class="component-icon">👥</div>
+                                <div class="component-name">Human-Swarm Collaboration</div>
+                            </div>
+                            <div class="component-desc">Citizens become part of collective intelligence network</div>
+                            <div class="component-metrics">👥 Participants: 1M+ humans | 🤝 Collaboration: Real-time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swarm-flow-section">
+                    <div class="flow-title">🐝 Complete Swarm Intelligence Flow</div>
+                    <div class="swarm-flow">
+                        <div class="swarm-step" data-step="13">
+                            🚀
+                            <div class="swarm-step-label">Swarm Deployment</div>
+                        </div>
+                        <div class="swarm-arrow" data-step="14">➡️</div>
+                        <div class="swarm-step" data-step="15">
+                            👁️
+                            <div class="swarm-step-label">Real-Time Monitoring</div>
+                        </div>
+                        <div class="swarm-arrow" data-step="16">➡️</div>
+                        <div class="swarm-step" data-step="17">
+                            🧠
+                            <div class="swarm-step-label">Collective Intelligence</div>
+                        </div>
+                        <div class="swarm-arrow" data-step="18">➡️</div>
+                        <div class="swarm-step" data-step="19">
+                            🛡️
+                            <div class="swarm-step-label">Threat Neutralization</div>
+                        </div>
+                        <div class="swarm-arrow" data-step="20">➡️</div>
+                        <div class="swarm-step" data-step="21">
+                            🤝
+                            <div class="swarm-step-label">Human Collaboration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Scenario View -->
+            <div class="demo-view" id="example-view">
+                <h2 class="demo-title">⚡ Real-World Example: Coordinated Disinformation Campaign</h2>
+                <p class="demo-subtitle">8-second swarm response to global deepfake attack during international crisis</p>
+
+                <div class="timeline-container">
+                    <div class="timeline-track"></div>
+                    
+                    <div class="timeline-item" data-step="1">
+                        <div class="timeline-content">
+                            <div class="timeline-time">T+0 Seconds</div>
+                            <div class="timeline-title">🚨 Coordinated Attack Detection</div>
+                            <p><strong>Crisis:</strong> Simultaneous deepfake videos of world leaders appear globally, with hidden AI malware amplifying false content during international crisis.</p>
+                            <div class="swarm-analysis">
+                                <div class="analysis-line">🐝 Scout agents across 50,000+ devices detect anomaly spike</div>
+                                <div class="analysis-line">⚡ Swarm convergence time: 8 seconds</div>
+                                <div class="analysis-line">🎯 Pattern: Coordinated attack (not isolated incidents)</div>
+                                <div class="analysis-line">🚀 Status: <span class="swarm-status status-warning">10,000+ AGENTS MOBILIZING</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-marker" data-step="1"></div>
+                    </div>
+
+                    <div class="timeline-item" data-step="2">
+                        <div class="timeline-content">
+                            <div class="timeline-time">T+15 Seconds</div>
+                            <div class="timeline-title">🔍 Multi-Agent Swarm Investigation</div>
+                            <p><strong>Collective Analysis:</strong> Specialized swarms converge for comprehensive threat analysis.</p>
+                            <div class="swarm-analysis">
+                                <div class="analysis-line">👁️ Visual swarm (500 agents): 94% facial manipulation detected</div>
+                                <div class="analysis-line">🎤 Audio swarm (300 agents): Voice synthesis signatures identified</div>
+                                <div class="analysis-line">🦠 Malware swarm (1,200 agents): 47 infected systems traced</div>
+                                <div class="analysis-line">🌐 Network swarm (800 agents): Global coordination confirmed</div>
+                            </div>
+                        </div>
+                        <div class="timeline-marker" data-step="2"></div>
+                    </div>
+
+                    <div class="timeline-item" data-step="3">
+                        <div class="timeline-content">
+                            <div class="timeline-time">T+45 Seconds</div>
+                            <div class="timeline-title">⚔️ Coordinated Swarm Neutralization</div>
+                            <p><strong>Attack Swarms Deploy:</strong> Specialized neutralization forces coordinate simultaneous response.</p>
+                            <div class="swarm-analysis">
+                                <div class="analysis-line">🎭 Deepfake neutralization (2,000 agents): Generation disrupted</div>
+                                <div class="analysis-line">🦠 Malware hunters (1,500 agents): Cross-network elimination</div>
+                                <div class="analysis-line">🛡️ Protection swarms: Vulnerable systems immunized</div>
+                                <div class="analysis-line">🚨 Status: <span class="swarm-status status-danger">THREAT NEUTRALIZATION IN PROGRESS</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-marker" data-step="3"></div>
+                    </div>
+
+                    <div class="timeline-item" data-step="4">
+                        <div class="timeline-content">
+                            <div class="timeline-time">T+2 Minutes</div>
+                            <div class="timeline-title">🌐 Ubiquitous Network Protection</div>
+                            <p><strong>Edge Device Response:</strong> Every connected device becomes part of collective defense.</p>
+                            <div class="swarm-analysis">
+                                <div class="analysis-line">📱 Edge agents: 500,000+ devices join protection swarm</div>
+                                <div class="analysis-line">🔗 Mesh security: Devices protect each other through coordination</div>
+                                <div class="analysis-line">👁️ Transparent ops: Users watch swarm agents working real-time</div>
+                                <div class="analysis-line">🗳️ Democratic response: Community input shapes swarm priorities</div>
+                            </div>
+                        </div>
+                        <div class="timeline-marker" data-step="4"></div>
+                    </div>
+
+                    <div class="timeline-item" data-step="5">
+                        <div class="timeline-content">
+                            <div class="timeline-time">T+10 Minutes</div>
+                            <div class="timeline-title">🤝 Human-Swarm Collaboration Complete</div>
+                            <p><strong>Collective Victory:</strong> Combined human-AI intelligence neutralizes threat and strengthens global network.</p>
+                            <div class="swarm-analysis">
+                                <div class="analysis-line">👥 Human agents: 50,000+ citizens joined swarm intelligence</div>
+                                <div class="analysis-line">🧠 Emergent learning: New detection methods developed</div>
+                                <div class="analysis-line">🌍 Global immunity: All networks protected against similar attacks</div>
+                                <div class="analysis-line">🎯 Status: <span class="swarm-status status-success">CRISIS AVERTED - NETWORK STRENGTHENED</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-marker" data-step="5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="narration">
+            <h4 id="narrationTitle">Step 1: Introduction</h4>
+            <p id="narrationText">Welcome to the Neuromorphic Swarm Intelligence Defense Network. This solution deploys thousands of brain-inspired AI agents that work like digital bees, creating collective intelligence that emerges from simple individual behaviors to detect and neutralize sophisticated threats.</p>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn success" id="playBtn">▶️ Play</button>
+            <button class="control-btn" id="pauseBtn" disabled>⏸️ Pause</button>
+            <button class="control-btn danger" id="resetBtn">🔄 Reset</button>
+            <button class="control-btn" id="speedBtn">⚡ 2x Speed</button>
+        </div>
+    </div>
+
+    <script>
+        class SwarmIntelligenceDemo {
+            constructor() {
+                this.currentMode = 'workflow';
+                this.currentStep = 0;
+                this.maxSteps = { workflow: 21, example: 5 };
+                this.isPlaying = false;
+                this.speed = 1;
+                this.stepInterval = null;
+                
+                this.narrations = {
+                    workflow: [
+                        "Welcome to the Neuromorphic Swarm Intelligence Defense Network demonstration.",
+                        "Layer 1: Deploy thousands of neuromorphic bee agents with spiking neural networks across the network.",
+                        "Edge device integration using Intel Loihi neuromorphic chips providing ultra-low power consumption of 0.1W per agent.",
+                        "Mesh network formation creates self-organizing decentralized communication with 99.99% uptime redundancy.",
+                        "Layer 2: Scout agent swarms provide continuous global monitoring with 8-second convergence capability.",
+                        "Worker agent collectives achieve 99.7% accuracy through emergent collective intelligence.",
+                        "Multi-modal detection swarms specialize in deepfakes (94% detection) and real-time malware tracking.",
+                        "Layer 3: Hive mind processing creates super-intelligence from simple agents without central control.",
+                        "Attack swarm deployment provides coordinated threat neutralization with 99.7% success rate in 8 seconds.",
+                        "Adaptive learning system enables continuous evolution and automatic adaptation to new threats.",
+                        "Layer 4: Edge swarm computing provides device-level protection with sub-millisecond latency.",
+                        "Transparent operations enable real-time monitoring and democratic governance of swarm behavior.",
+                        "Human-swarm collaboration integrates 1M+ human participants in real-time collective intelligence.",
+                        "Swarm flow begins with distributed deployment across global network...",
+                        "...agents establish real-time monitoring of all digital content streams...",
+                        "...collective intelligence emerges from individual agent interactions...",
+                        "...coordinated threat neutralization deploys specialized attack swarms...",
+                        "...human collaboration enhances swarm intelligence with contextual understanding...",
+                        "...adaptive learning strengthens the entire network against future threats...",
+                        "...ubiquitous protection scales with network size for planetary-scale defense...",
+                        "Complete swarm integration: 8-second response time with emergent super-intelligence and democratic governance."
+                    ],
+                    example: [
+                        "Crisis scenario: Coordinated disinformation campaign with deepfakes and AI malware during international crisis.",
+                        "T+15 Seconds: Multi-agent swarm investigation reveals sophisticated attack across multiple vectors with global coordination.",
+                        "T+45 Seconds: Coordinated swarm neutralization deploys 3,500+ specialized agents for simultaneous threat elimination.",
+                        "T+2 Minutes: Ubiquitous network protection activates 500,000+ edge devices with transparent democratic operations.",
+                        "T+10 Minutes: Human-swarm collaboration complete - crisis averted, network strengthened with 50,000+ human participants."
+                    ]
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.createBeeSwarm();
+                this.updateNarration();
+            }
+
+            bindEvents() {
+                // Mode selector
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.switchMode(e.target.dataset.mode);
+                    });
+                });
+
+                // Control buttons
+                document.getElementById('playBtn').addEventListener('click', () => this.play());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.pause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.reset());
+                document.getElementById('speedBtn').addEventListener('click', () => this.toggleSpeed());
+            }
+
+            switchMode(mode) {
+                if (this.isPlaying) this.pause();
+                
+                this.currentMode = mode;
+                this.currentStep = 0;
+                
+                // Update active button
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+                
+                // Switch view
+                document.querySelectorAll('.demo-view').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById(`${mode}-view`).classList.add('active');
+                
+                this.reset();
+            }
+
+            play() {
+                this.isPlaying = true;
+                document.getElementById('playBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+                
+                this.stepInterval = setInterval(() => {
+                    this.nextStep();
+                }, 2500 / this.speed);
+            }
+
+            pause() {
+                this.isPlaying = false;
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                
+                if (this.stepInterval) {
+                    clearInterval(this.stepInterval);
+                    this.stepInterval = null;
+                }
+            }
+
+            reset() {
+                this.pause();
+                this.currentStep = 0;
+                
+                // Reset all animations
+                const currentView = document.getElementById(`${this.currentMode}-view`);
+                currentView.querySelectorAll('.swarm-layer, .swarm-component, .swarm-step, .swarm-arrow, .timeline-item, .timeline-marker').forEach(el => {
+                    el.classList.remove('animate-in', 'highlight');
+                });
+                
+                this.updateProgress();
+                this.updateNarration();
+            }
+
+            toggleSpeed() {
+                this.speed = this.speed === 1 ? 2 : 1;
+                document.getElementById('speedBtn').textContent = this.speed === 1 ? '⚡ 2x Speed' : '⚡ 1x Speed';
+                
+                if (this.isPlaying) {
+                    this.pause();
+                    this.play();
+                }
+            }
+
+            nextStep() {
+                const maxSteps = this.maxSteps[this.currentMode];
+                if (this.currentStep >= maxSteps) {
+                    this.pause();
+                    return;
+                }
+                
+                this.currentStep++;
+                this.animateStep(this.currentStep);
+                this.updateProgress();
+                this.updateNarration();
+            }
+
+            animateStep(step) {
+                const currentView = document.getElementById(`${this.currentMode}-view`);
+                
+                // Remove previous highlights
+                currentView.querySelectorAll('.highlight').forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                
+                // Find elements for this step
+                const elements = currentView.querySelectorAll(`[data-step="${step}"]`);
+                
+                elements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('animate-in');
+                        
+                        // Add highlight effect
+                        setTimeout(() => {
+                            el.classList.add('highlight');
+                        }, 300);
+                        
+                        // Remove highlight after animation
+                        setTimeout(() => {
+                            el.classList.remove('highlight');
+                        }, 2000);
+                        
+                    }, index * 200);
+                });
+            }
+
+            updateProgress() {
+                const maxSteps = this.maxSteps[this.currentMode];
+                const progress = (this.currentStep / maxSteps) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+
+            updateNarration() {
+                const narration = this.narrations[this.currentMode][this.currentStep] || 
+                                "Demonstration complete. Click Reset to watch again or switch modes to see the coordinated attack response scenario.";
+                
+                document.getElementById('narrationTitle').textContent = `Step ${this.currentStep + 1}: ${this.getStepTitle()}`;
+                document.getElementById('narrationText').textContent = narration;
+            }
+
+            getStepTitle() {
+                const titles = {
+                    workflow: {
+                        0: "Introduction",
+                        1: "Neuromorphic Agents",
+                        2: "Edge Integration",
+                        3: "Mesh Network",
+                        4: "Scout Swarms",
+                        5: "Worker Collectives",
+                        6: "Multi-Modal Detection",
+                        7: "Hive Mind Processing",
+                        8: "Attack Swarms",
+                        9: "Adaptive Learning",
+                        10: "Edge Computing",
+                        11: "Transparent Operations",
+                        12: "Human Collaboration",
+                        13: "Swarm Deployment",
+                        14: "Real-Time Monitoring",
+                        15: "Collective Intelligence",
+                        16: "Threat Neutralization",
+                        17: "Human Integration",
+                        18: "Adaptive Evolution",
+                        19: "Network Protection",
+                        20: "Global Defense",
+                        21: "Complete Integration"
+                    },
+                    example: {
+                        0: "Crisis Emergence",
+                        1: "Attack Detection",
+                        2: "Swarm Investigation",
+                        3: "Coordinated Response",
+                        4: "Network Protection",
+                        5: "Human Collaboration"
+                    }
+                };
+                return titles[this.currentMode][this.currentStep] || "System Overview";
+            }
+
+            createBeeSwarm() {
+                setInterval(() => {
+                    if (this.isPlaying) {
+                        const bee = document.createElement('div');
+                        bee.className = 'bee-swarm';
+                        bee.innerHTML = '🐝';
+                        bee.style.left = Math.random() * window.innerWidth + 'px';
+                        bee.style.top = Math.random() * window.innerHeight + 'px';
+                        document.body.appendChild(bee);
+                        
+                        setTimeout(() => {
+                            if (bee.parentNode) {
+                                bee.parentNode.removeChild(bee);
+                            }
+                        }, 4000);
+                    }
+                }, 500);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SwarmIntelligenceDemo();
+        });
+    </script>
+</body>
+</html>
